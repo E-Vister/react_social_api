@@ -1,12 +1,14 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
+const Cookies = require('cookies');
 
 const app = express();
 app.use(bodyParser.json({inflate: true}));
 
 app.use(cors({
-    origin: '*'
+    origin: 'http://localhost:3000',
+	credentials: true,
 }));
 
 let postAuthorPatternConventer = (id) => {
@@ -22,6 +24,7 @@ let users = [
 			id: 0,
 			name: `Jegoras`,
 			surname: `Vistai`,
+			login: 'vistai',
 			avatar: `https://d.newsweek.com/en/full/520858/supermoon-moon-smartphone-photo-picture.jpg?w=1600&h=1600&q=88&f=bb45f0cd0324ae5e04827f684a9da7e8`,
 			banner: `https://i.pinimg.com/564x/47/3e/56/473e56947934767caf74558c2daf8e58.jpg`,
 			status: 'CS:GO commentator, player and analyst',
@@ -36,6 +39,7 @@ let users = [
 			id: 1,
 			name: `John`,
 			surname: `Garner`,
+			login: 'admin',
 			avatar: `https://static6.depositphotos.com/1003369/659/i/600/depositphotos_6591667-stock-photo-close-up-of-beautiful-womanish.jpg`,
 			banner: `https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS4Gl4aAcxcGLVPCuUuNA55iO0l0ovDHsfEy8OjYhmply6b2EhLqjVf2n6a_WitUsjS_AM&usqp=CAU`,
 			status: '✈️ California tomorrow',
@@ -50,6 +54,7 @@ let users = [
 			id: 2,
 			name: `Jane`,
 			surname: `Heaton`,
+			login: 'j.heaton',
 			avatar: `https://www.datocms-assets.com/55010/1631448989-1609827493259134-modelo.jpg?auto=format%2Ccompress&cs=srgb`,
 			banner: `https://cdn.pixabay.com/photo/2015/10/29/14/38/web-1012467__340.jpg`,
 			status: 'Model from UK',
@@ -64,6 +69,7 @@ let users = [
 			id: 3,
 			name: `Alex`,
 			surname: `Drake`,
+			login: 'cooldrake',
 			avatar: `https://sticker-collection.com/stickers/plain/johnnysinsbrazzers/512/c912f70a-f67f-4fe1-af3c-10b5c590047ffile_368359.webp`,
 			banner: `https://t4.ftcdn.net/jpg/04/67/92/91/360_F_467929117_kAYW6tFAxAFE1PteYPbSpguPQNNNfVkr.jpg`,
 			status: 'playing Call of Duty: Modern Warfare',
@@ -78,6 +84,7 @@ let users = [
 			id: 4,
 			name: `Jakub`,
 			surname: `Mathis`,
+			login: 'j.mathis',
 			avatar: `https://m.media-amazon.com/images/I/61GLqTPhoJL._AC_UL400_.jpg`,
 			banner: `https://t4.ftcdn.net/jpg/04/67/92/91/360_F_467929117_kAYW6tFAxAFE1PteYPbSpguPQNNNfVkr.jpg`,
 			status: '',
@@ -92,6 +99,7 @@ let users = [
 			id: 5,
 			name: `Elisabeth`,
 			surname: `Plummer`,
+			login: 'e.plumer',
 			avatar: `https://blogforlife.org/wp-content/uploads/2022/05/post_0700_0_debora-lombardi-flower.jpg`,
 			banner: `https://t4.ftcdn.net/jpg/04/67/92/91/360_F_467929117_kAYW6tFAxAFE1PteYPbSpguPQNNNfVkr.jpg`,
 			status: '',
@@ -106,6 +114,7 @@ let users = [
 			id: 6,
 			name: `Michael`,
 			surname: `Smith`,
+			login: 'smith1987',
 			avatar: `https://i.guim.co.uk/img/media/b3f9db5d504c00304c37724927b6e407da17c36b/0_197_5850_3511/master/5850.jpg?width=1200&height=1200&quality=85&auto=format&fit=crop&s=87966753ed0906994f60f72735295414`,
 			banner: `https://t4.ftcdn.net/jpg/04/67/92/91/360_F_467929117_kAYW6tFAxAFE1PteYPbSpguPQNNNfVkr.jpg`,
 			status: 'tierschutzbund.de',
@@ -207,6 +216,41 @@ let profileResponseCreator = (id) => {
 	};
 }
 
+let loginResponseCreator = (user, loginStatus) => {
+	if (loginStatus) {
+		return {
+			resultCode: 0,
+			loginData: {
+			  id: user.id,
+			  login: user.login
+			}
+		}
+	} else {
+		return {
+			resultCode: 1,
+			message: "You're not authorized!"
+		}
+	}
+
+};
+
+let followResponseCreactor = (method, loginStatus, followStatus = null) => {
+	if (method === 'GET') return followStatus;
+
+	if (loginStatus) {
+		return {
+			resultCode: 0,
+			followStatus,
+			message: 'OK.'
+		}
+	} else {
+		return {
+			resultCode: 1,
+			message: "Something went wrong."
+		}
+	}
+}
+
 app.get('/', (req, res) => {
     res.send('ReactSocial API');
 });
@@ -240,6 +284,63 @@ app.delete('/api/1.0/users/:id', (req, res) => {
 
 app.get('/api/1.0/profile/:id', (req, res) => {
     res.json(profileResponseCreator(req.params.id));
+});
+
+app.get('/api/1.0/auth/login/:login', (req, res) => {
+	let login = req.params.login;
+	let user = users.find(u => u.login === login);
+	let cookies = new Cookies(req, res);
+
+	if (user) {
+		cookies.set('login', login);
+		res.json(loginResponseCreator(user, true));
+	} else {
+		res.json(loginResponseCreator(null, false));
+	}
+});
+
+app.get('/api/1.0/auth/me', (req, res) => {
+	let cookies = new Cookies(req, res);
+
+	if (cookies.get('login')){
+		let user = users.find(u => u.login === cookies.get('login'));
+		res.json(loginResponseCreator(user, true));
+	} else {
+		res.json(loginResponseCreator(null, false));
+	}
+});
+
+app.get('/api/1.0/follow/:id', (req, res) => {
+	let cookies = new Cookies(req, res);
+	let userFollow = users.find(u => u.id === +req.params.id).isFollowed;
+
+	res.json(followResponseCreactor('GET', cookies.get('login'), userFollow));
+});
+
+app.post('/api/1.0/follow/:id', (req, res) => {
+	let cookies = new Cookies(req, res);
+	let userToFollow = users.find(u => u.id === +req.params.id);
+
+	if (cookies.get('login')){
+		let user = users.find(u => u.login === cookies.get('login'));
+		userToFollow.isFollowed = true;
+		res.json(followResponseCreactor('POST', true, userToFollow.isFollowed));
+	} else {
+		res.json(followResponseCreactor('POST', false));
+	}
+});
+
+app.delete('/api/1.0/follow/:id', (req, res) => {
+	let cookies = new Cookies(req, res);
+	let userToFollow = users.find(u => u.id === +req.params.id);
+
+	if (cookies.get('login')){
+		let user = users.find(u => u.login === cookies.get('login'));
+		userToFollow.isFollowed = false;
+		res.json(followResponseCreactor('DELETE', true, userToFollow.isFollowed));
+	} else {
+		res.json(followResponseCreactor('DELETE', false));
+	}
 });
 
 app.listen(5000, () => console.log('Listening on port 5000'));
