@@ -215,7 +215,7 @@ let loginResponseCreator = (user, loginStatus) => {
     } else {
         return {
             resultCode: 1,
-            message: "You're not authorized!"
+            message: "Incorrect login!"
         }
     }
 
@@ -232,7 +232,7 @@ let followResponseCreator = (method, loginStatus, followStatus = null) => {
         return {
             resultCode: 0,
             followStatus,
-            message: 'OK.'
+            message: 'OK'
         }
     } else {
         return {
@@ -253,7 +253,7 @@ let statusResponseCreator = (method, userProfileStatus, loginStatus = false) => 
         if (loginStatus) {
             return {
                 resultCode: 0,
-                message: 'OK.'
+                message: 'OK'
             }
         } else {
             return {
@@ -328,16 +328,30 @@ app.put('/api/1.0/profile/status/', (req, res) => {
     }
 });
 
-app.get('/api/1.0/auth/login/:login', (req, res) => {
-    let login = req.params.login;
-    let user = users.find(u => u.login === login);
+app.post('/api/1.0/auth/login', (req, res) => {
     let cookies = new Cookies(req, res);
+    let login = req.body.login;
+    let user = users.find(u => u.login === login);
 
     if (user) {
         cookies.set('login', login);
         res.json(loginResponseCreator(user, true));
     } else {
         res.json(loginResponseCreator(null, false));
+    }
+});
+
+app.delete('/api/1.0/auth/login', (req, res) => {
+    let cookies = new Cookies(req, res);
+
+    if (cookies.get('login')) {
+        res.clearCookie('login');
+    }
+
+    if (!cookies.get('login')) {
+        res.json({resultCode: 0, message: 'OK'});
+    } else {
+        res.json({resultCode: 1, message: 'Something went wrong'});
     }
 });
 
