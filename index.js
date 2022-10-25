@@ -328,6 +328,28 @@ app.put('/api/1.0/profile/status/', (req, res) => {
     }
 });
 
+app.post('/api/1.0/profile/posts', (req, res) => {
+    let cookies = new Cookies(req, res);
+
+    if (cookies.get('login')) {
+        let user = users.find(u => u.login === cookies.get('login'));
+        let posts = usersPosts[`posts-user-${req.body.id}`]
+
+        posts.push(
+            {
+                id: posts.length + 1,
+                author: postAuthorPatternConventer(user.id),
+                message: req.body.message,
+                likeCount: 0
+            }
+        );
+
+        res.json({resultCode: 0, message: 'OK', data: {posts}});
+    } else {
+        res.json({resultCode: 1, message: "You're not authorized"});
+    }
+});
+
 app.post('/api/1.0/auth/login', (req, res) => {
     let cookies = new Cookies(req, res);
     let login = req.body.login;
