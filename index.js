@@ -272,27 +272,11 @@ app.get('/api/1.0/users', (req, res) => {
     let page = req.query.page || 1;
     let count = req.query.count || 2;
 
-    res.json(usersResponseCreator(page, count));
-});
-
-app.post('/api/1.0/users', (req, res) => {
-    users.push(req.body);
-    res.json(req.body);
-});
-
-app.put('/api/1.0/users/:id', (req, res) => {
-    const user = users.find(u => u.id === +req.params.id);
-    const userIndex = users.indexOf(user);
-    users[userIndex] = {...user, ...req.body};
-    res.json({success: true});
-
-});
-
-app.delete('/api/1.0/users/:id', (req, res) => {
-    const user = users.find(u => u.id === +req.params.id);
-    const userIndex = users.indexOf(user);
-    users.splice(userIndex, 1);
-    res.json({success: true});
+    if (count <= 50) {
+        res.json(usersResponseCreator(page, count));
+    } else {
+        res.json({message: 'Maximum count is 50!'})
+    }
 });
 
 app.get('/api/1.0/profile/:id', (req, res) => {
