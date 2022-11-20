@@ -522,18 +522,20 @@ URI Parameters
 {
   "resultCode": 0,
   "message": "OK",
-  "posts": [
-    {
-      "id": 1,
-      "author": {
-        "name": "Bob",
-        "surname": "Anderson",
-        "avatar": "https://someurl.com/avatar.png"
-      },
-      "message": "Some message",
-      "likeCount": 5
-    }
-  ]
+  "data": {
+    "posts": [
+      {
+        "id": 1,
+        "author": {
+          "name": "Bob",
+          "surname": "Anderson",
+          "avatar": "https://someurl.com/avatar.png"
+        },
+        "message": "Some message",
+        "likeCount": 5
+      }
+    ]
+  }
 }
  ```
 
