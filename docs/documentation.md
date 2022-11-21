@@ -610,7 +610,7 @@ Query Parameters
 {
   "items": [
     {
-      "id": 1,
+      "id": 0,
       "name": "John",
       "surname": "Doe",
       "avatar": "https://someurl.com/avatar.png",
