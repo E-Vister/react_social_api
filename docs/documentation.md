@@ -18,11 +18,7 @@
 
   (0 if operation completed successful, other numbers - some error occurred)
 
-* **message:** *(array or string)*
-
-  is empty if resultCode is 0, contains error messages if resultCode is different from 0
-
-* **data:** *required(object)*
+* **loginData:** *required(object)*
 
   if user is authenticated then data contains all this properties
 
@@ -42,6 +38,34 @@
 
       logged user surname
 
+* **dialogs:** *required(array)*
+
+  user's dialogs
+
+  * **dialog** *required(object)*
+  
+    * **dialogId** *required(number)*
+
+    * **members** *required(array)*
+    
+      array of dialog participants
+
+    * **messages** *required(array)*
+
+      array of dialog messages
+    
+      * **id** *required(number)*
+
+        message id
+
+      * **author** *required(object)*
+
+        message author
+
+      * **content** *required(string)*
+
+        message content
+
 **Example:**
 
 ```json
@@ -52,7 +76,48 @@
     "login": "user",
     "name": "John",
     "surname": "Doe"
-  }
+  },
+  "dialogs": [
+    {
+      "dialogId": 0,
+      "members": [
+        {
+          "id": 0,
+          "name": "John",
+          "surname": "Doe",
+          "avatar": "https://someurl.com/avatar.png"
+        },
+        {
+          "id": 1,
+          "name": "Bob",
+          "surname": "Smith",
+          "avatar": "https://someurl.com/avatar.png"
+        }
+      ],
+      "messages": [
+        {
+          "id": 0,
+          "author": {
+            "id": 0,
+            "name": "John",
+            "surname": "Doe",
+            "avatar": "https://someurl.com/avatar.png"
+          },
+          "content": "Hey"
+        },
+        {
+          "id": 1,
+          "author": {
+            "id": 1,
+            "name": "Bob",
+            "surname": "Smith",
+            "avatar": "https://someurl.com/avatar.png"
+          },
+          "content": "Hello"
+        }
+      ]
+    }
+  ]
 }
  ```
 

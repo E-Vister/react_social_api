@@ -11,15 +11,16 @@ app.use(cors({
     credentials: true,
 }));
 
-let postAuthorPatternConventer = (id) => {
+let userInfoReducer = (id) => {
     return {
+        id: users[id].id,
         name: users[id].name,
         surname: users[id].surname,
         avatar: users[id].avatar,
     }
 };
 
-let users = [
+const users = [
     {
         id: 0,
         name: `Jegoras`,
@@ -127,23 +128,23 @@ let users = [
     },
 ];
 
-let usersPosts = {
+const usersPosts = {
     "posts-user-0": [
         {
             id: 1,
-            author: postAuthorPatternConventer(1),
+            author: userInfoReducer(1),
             message: `Hey. How are you feeling today?`,
             likeCount: 20
         },
         {
             id: 2,
-            author: postAuthorPatternConventer(6),
+            author: userInfoReducer(6),
             message: `I finished my album. Go check it out!`,
             likeCount: 34
         },
         {
             id: 3,
-            author: postAuthorPatternConventer(3),
+            author: userInfoReducer(3),
             message: `I'm going on a picnic. Do you wanna join?`,
             likeCount: 1
         },
@@ -156,7 +157,62 @@ let usersPosts = {
     "posts-user-6": [],
 };
 
-let usersResponseCreator = (page, count) => {
+const usersDialogsStorage = {
+    'user-0': [0, 1, 2, 3, 4],
+    'user-1': [0],
+    'user-2': [1],
+    'user-3': [2],
+    'user-4': [3],
+    'user-5': [4],
+    'user-6': [],
+
+};
+
+const dialogs = [
+    {
+        dialogId: 0,
+        members: [userInfoReducer(0), userInfoReducer(1)],
+        messages: [
+            {id: 0, author: userInfoReducer(1), content: `Morning`},
+            {id: 1, author: userInfoReducer(1), content: `What about our business?`},
+        ],
+    },
+    {
+        dialogId: 1,
+        members: [userInfoReducer(0), userInfoReducer(2)],
+        messages: [
+            {id: 0, author: userInfoReducer(2), content: `Are you free?`},
+            {id: 1, author: userInfoReducer(0), content: `Yup`},
+            {id: 2, author: userInfoReducer(2), content: `Let's meet in an hour`},
+            {id: 3, author: userInfoReducer(0), content: `Deal`},
+        ],
+    },
+    {
+        dialogId: 2,
+        members: [userInfoReducer(0), userInfoReducer(3)],
+        messages: [
+            {id: 0, author: userInfoReducer(3), content: `Wanna play? I'll invite u`},
+            {id: 1, author: userInfoReducer(0), content: `Sure. I'll be right in`},
+        ],
+    },
+    {
+        dialogId: 3,
+        members: [userInfoReducer(0), userInfoReducer(4)],
+        messages: [
+            {id: 0, author: userInfoReducer(0), content: `Do you remember that we have a meeting today?`},
+            {id: 1, author: userInfoReducer(4), content: `Yh. I won't be late`},
+        ],
+    },
+    {
+        dialogId: 4,
+        members: [userInfoReducer(0), userInfoReducer(5)],
+        messages: [
+            {id: 0, author: userInfoReducer(5), content: `Come to the exhibition today at 7 pm!`},
+        ]
+    },
+];
+
+const usersResponseCreator = (page, count) => {
     let items = [];
     [...users].splice(page * count - count, count).map(i => {
         items.push({
@@ -179,7 +235,7 @@ let usersResponseCreator = (page, count) => {
     };
 };
 
-let profileResponseCreator = (user) => {
+const profileResponseCreator = (user) => {
     let items = {
         id: user.id,
         name: user.name,
@@ -201,8 +257,12 @@ let profileResponseCreator = (user) => {
     };
 }
 
-let loginResponseCreator = (user, loginStatus) => {
+const loginResponseCreator = (user, loginStatus) => {
     if (loginStatus) {
+        let userDialogs = [];
+
+        usersDialogsStorage[`user-${user.id}`].map((i) => userDialogs.push(dialogs[i]));
+
         return {
             resultCode: 0,
             loginData: {
@@ -210,8 +270,9 @@ let loginResponseCreator = (user, loginStatus) => {
                 login: user.login,
                 name: user.name,
                 surname: user.surname,
-            }
-        }
+            },
+            dialogs: userDialogs
+        };
     } else {
         return {
             resultCode: 1,
@@ -221,7 +282,7 @@ let loginResponseCreator = (user, loginStatus) => {
 
 };
 
-let followResponseCreator = (method, loginStatus, followStatus = null) => {
+const followResponseCreator = (method, loginStatus, followStatus = null) => {
     if (method === 'GET') {
         return {
             value: followStatus
@@ -242,7 +303,7 @@ let followResponseCreator = (method, loginStatus, followStatus = null) => {
     }
 }
 
-let statusResponseCreator = (method, userProfileStatus, loginStatus = false) => {
+const statusResponseCreator = (method, userProfileStatus, loginStatus = false) => {
     if (method === 'GET') {
         return {
             value: userProfileStatus
@@ -280,13 +341,13 @@ app.get('/api/1.0/users', (req, res) => {
 });
 
 app.get('/api/1.0/profile/:id', (req, res) => {
-	const user = users.find(u => u.id === +req.params.id);
-	
-	if (user) {
-		res.json(profileResponseCreator(user));
-	} else {
-		res.json({message: 'No such /profile method.'});
-	}
+    const user = users.find(u => u.id === +req.params.id);
+
+    if (user) {
+        res.json(profileResponseCreator(user));
+    } else {
+        res.json({message: 'No such /profile method.'});
+    }
 });
 
 app.get('/api/1.0/profile/status/:id', (req, res) => {
