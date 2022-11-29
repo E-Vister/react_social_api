@@ -58,9 +58,9 @@
 
         message id
 
-      * **author** *required(object)*
+      * **authorId** *required(number)*
 
-        message author
+        message author id
 
       * **content** *required(string)*
 
@@ -97,22 +97,12 @@
       "messages": [
         {
           "id": 0,
-          "author": {
-            "id": 0,
-            "name": "John",
-            "surname": "Doe",
-            "avatar": "https://someurl.com/avatar.png"
-          },
+          "authorId": 0,
           "content": "Hey"
         },
         {
           "id": 1,
-          "author": {
-            "id": 1,
-            "name": "Bob",
-            "surname": "Smith",
-            "avatar": "https://someurl.com/avatar.png"
-          },
+          "authorId": 1,
           "content": "Hello"
         }
       ]

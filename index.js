@@ -173,41 +173,41 @@ const dialogs = [
         dialogId: 0,
         members: [userInfoReducer(0), userInfoReducer(1)],
         messages: [
-            {id: 0, author: userInfoReducer(1), content: `Morning`},
-            {id: 1, author: userInfoReducer(1), content: `What about our business?`},
+            {id: 0, authorId: 1, content: `Morning`},
+            {id: 1, authorId: 1, content: `What about our business?`},
         ],
     },
     {
         dialogId: 1,
         members: [userInfoReducer(0), userInfoReducer(2)],
         messages: [
-            {id: 0, author: userInfoReducer(2), content: `Are you free?`},
-            {id: 1, author: userInfoReducer(0), content: `Yup`},
-            {id: 2, author: userInfoReducer(2), content: `Let's meet in an hour`},
-            {id: 3, author: userInfoReducer(0), content: `Deal`},
+            {id: 0, authorId: 2, content: `Are you free?`},
+            {id: 1, authorId: 0, content: `Yup`},
+            {id: 2, authorId: 2, content: `Let's meet in an hour`},
+            {id: 3, authorId: 0, content: `Deal`},
         ],
     },
     {
         dialogId: 2,
         members: [userInfoReducer(0), userInfoReducer(3)],
         messages: [
-            {id: 0, author: userInfoReducer(3), content: `Wanna play? I'll invite u`},
-            {id: 1, author: userInfoReducer(0), content: `Sure. I'll be right in`},
+            {id: 0, authorId: 3, content: `Wanna play? I'll invite u`},
+            {id: 1, authorId: 0, content: `Sure. I'll be right in`},
         ],
     },
     {
         dialogId: 3,
         members: [userInfoReducer(0), userInfoReducer(4)],
         messages: [
-            {id: 0, author: userInfoReducer(0), content: `Do you remember that we have a meeting today?`},
-            {id: 1, author: userInfoReducer(4), content: `Yh. I won't be late`},
+            {id: 0, authorId: 0, content: `Do you remember that we have a meeting today?`},
+            {id: 1, authorId: 4, content: `Yh. I won't be late`},
         ],
     },
     {
         dialogId: 4,
         members: [userInfoReducer(0), userInfoReducer(5)],
         messages: [
-            {id: 0, author: userInfoReducer(5), content: `Come to the exhibition today at 7 pm!`},
+            {id: 0, authorId: 5, content: `Come to the exhibition today at 7 pm!`},
         ]
     },
 ];
