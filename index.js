@@ -259,10 +259,6 @@ const profileResponseCreator = (user) => {
 
 const loginResponseCreator = (user, loginStatus) => {
     if (loginStatus) {
-        let userDialogs = [];
-
-        usersDialogsStorage[`user-${user.id}`].map((i) => userDialogs.push(dialogs[i]));
-
         return {
             resultCode: 0,
             loginData: {
@@ -271,7 +267,7 @@ const loginResponseCreator = (user, loginStatus) => {
                 name: user.name,
                 surname: user.surname,
             },
-            dialogs: userDialogs
+            dialogs: dialogsResponseCreator(user).dialogs
         };
     } else {
         return {
@@ -323,6 +319,17 @@ const statusResponseCreator = (method, userProfileStatus, loginStatus = false) =
             }
         }
     }
+}
+
+const dialogsResponseCreator = (user) => {
+    let userDialogs = [];
+
+    usersDialogsStorage[`user-${user.id}`].map((i) => userDialogs.push(dialogs[i]));
+
+    return {
+        resultCode: 0,
+        dialogs: userDialogs
+    };
 }
 
 app.get('/', (req, res) => {
@@ -383,7 +390,7 @@ app.post('/api/1.0/profile/posts', (req, res) => {
         posts.push(
             {
                 id: posts.length + 1,
-                author: postAuthorPatternConventer(user.id),
+                author: userInfoReducer(user.id),
                 message: req.body.message,
                 likeCount: 0
             }
@@ -463,6 +470,27 @@ app.delete('/api/1.0/follow/:id', (req, res) => {
         res.json(followResponseCreator('DELETE', true, userToFollow.isFollowed));
     } else {
         res.json(followResponseCreator('DELETE', false));
+    }
+});
+
+app.post('/api/1.0/dialogs', (req, res) => {
+    let cookies = new Cookies(req, res);
+    let {dialogId, content} = req.body;
+
+    if (cookies.get('login')) {
+        let user = users.find(u => u.login === cookies.get('login'));
+
+        dialogs[dialogId].messages.push(
+            {
+                id: dialogs[dialogId].messages.length,
+                authorId: user.id,
+                content: content
+            }
+        );
+
+        res.json(dialogsResponseCreator(user));
+    } else {
+        res.json({resultCode: 1, message: "You're not authorized"});
     }
 });
 
